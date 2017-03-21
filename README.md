@@ -2,7 +2,7 @@ example docker-compose.yml
 
 ```
 example.com:
- image: casp/site-php7.1
+ image: casp/site-php5
  restart: always
  container_name: example.com
  hostname: example.com
@@ -14,18 +14,22 @@ example.com:
   - /srv/docker/docker-sitehosting/example.com/log/supervisor/:/var/log/supervisor
   - /srv/docker/docker-sitehosting/example.com/letsencrypt:/var/www/letsencrypt:ro
   - /srv/docker/docker-sitehosting/example.com/sftpdev-home:/home/sftpdev
+  - /srv/docker/docker-sitehosting/crontabs/:/var/spool/cron/:rw
  ports:
   - "1089:80"
+  - "2200:22"
  command: "/usr/bin/python /usr/bin/supervisord -c /etc/supervisor/supervisord.conf"
  external_links:
   - mysql_local
 ```
+Add ssh key to file /srv/docker/docker-sitehosting/example.com/sftpdev-home/.ssh/authorized_keys and login remote by server ip and port 2200.
 
-After login:
+And after login:
 ```
 sudo supervisorctl status
-apache2                          RUNNING    pid 11, uptime 8 days, 0:45:32
-nginx                            RUNNING    pid 9, uptime 8 days, 0:45:33
-sshd                             RUNNING    pid 10, uptime 8 days, 0:45:32
+apache2                          RUNNING    pid 27, uptime 0:24:53
+cron                             FATAL      Exited too quickly (process log may have details)
+nginx                            RUNNING    pid 16, uptime 0:24:54
+sshd                             RUNNING    pid 17, uptime 0:24:54
 ```
 
