@@ -11,6 +11,7 @@ apt-get install -y wget nginx supervisor libapache2-mod-rpaf sudo git mc net-too
         libcurl4-openssl-dev \
         libpspell-dev \
         libtidy-dev \
+        libgeoip-dev \
         libxslt1-dev 
 
 WORKDIR /usr/src
@@ -42,6 +43,10 @@ RUN docker-php-ext-install xsl zip
 RUN docker-php-ext-install pdo pdo_mysql 
 RUN docker-php-ext-install xml  xmlrpc xmlwriter 
 
+#RUN pecl install memcache && echo "extension=memcache.so" >> /usr/local/etc/php/conf.d/memcache.ini
+RUN pecl install geoip-1.1.1  && echo "extension=geoip.so" >> /usr/local/etc/php/conf.d/geoip.ini 
+
+
 
 RUN a2enmod rpaf rewrite
 ADD apache-security.conf /etc/apache2/conf-enabled/security.conf
@@ -50,13 +55,11 @@ ADD supervisord.conf /etc/supervisor/
 
 #RUN /usr/bin/ssh-keygen -A
 
-RUN useradd -d /home/sftpdev/ -s /bin/bash -o -g 33 -u 33 sftpdev; \
-    usermod -d /home/sftpdev/ www-data && \
+RUN useradd -m -d /home/sftpdev/ -s /bin/bash -o -g 33 -u 33 sftpdev; \
     echo "sftpdev ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers; \
-    ln -s /var/www/html/ /home/sftpdev/ ; \
     echo "www-data ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-
+RUN ln -s /var/www/html /home/sftpdev/html -f
 
 RUN mkdir /var/run/sshd; chmod 0755 /var/run/sshd
 RUN sed -i "s/Listen 80/Listen 81/g" /etc/apache2/ports.conf
