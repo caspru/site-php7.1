@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:7.0-apache
 RUN apt-get update && \
 apt-get install -y wget nginx supervisor libapache2-mod-rpaf sudo git mc net-tools openssh-server mysql-client vim nano msmtp \
 	cron gcc make libjpeg-dev libpng-dev libtiff-dev libvpx-dev libxpm-dev libfontconfig1-dev libxpm-dev checkinstall \
@@ -19,21 +19,17 @@ WORKDIR /usr/src
 RUN wget https://github.com/libgd/libgd/releases/download/gd-2.1.1/libgd-2.1.1.tar.gz
 RUN tar zxvf libgd-2.1.1.tar.gz
 WORKDIR /usr/src/libgd-2.1.1
-#RUN apt-get install cron gcc make libjpeg-dev libpng-dev libtiff-dev libvpx-dev libxpm-dev libfontconfig1-dev libxpm-dev checkinstall -y
 RUN ./configure
 RUN make
 RUN checkinstall --pkgname=libgd3
-#RUN apt-get update && apt-get install -y \
-#        libfreetype6-dev \
-#        libjpeg62-turbo-dev \
-#        libmcrypt-dev \
-#        libpng12-dev \
-#        libxml2 \
-#        libxml2-dev \
-#        libcurl4-openssl-dev \
-#        libpspell-dev \
-#        libtidy-dev \
-#        libxslt1-dev \
+
+
+
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-gd=/usr/src/libgd-2.1.1/src/ \
+        && docker-php-ext-install gd \
+        &&  ln -s /usr/local/lib/libgd.so.3 /usr/lib/x86_64-linux-gnu/libgd.so.3
+
+
 RUN docker-php-ext-install iconv mcrypt \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-gd=/usr/src/libgd-2.1.1/src/ \
     && docker-php-ext-install gd 
@@ -85,3 +81,25 @@ CMD ["/start.sh"]
 #RUN ./configure
 #RUN make
 #RUN checkinstall
+
+#COMPOSER
+RUN cd /home/sftpdev/ && \
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php -r "if (hash_file('SHA384', 'composer-setup.php') === '544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
+    php composer-setup.php && \
+    php -r "unlink('composer-setup.php');"
+
+RUN chown 33:33 /var/www/
+
+
+#CLEAN
+RUN apt-get remove -y gcc make libjpeg-dev libpng-dev libtiff-dev libvpx-dev libxpm-dev libfontconfig1-dev libxpm-dev checkinstall  libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libpng12-dev \
+        libxml2-dev \
+        libcurl4-openssl-dev \
+        libpspell-dev \
+        libtidy-dev \
+        libxslt1-dev
+
