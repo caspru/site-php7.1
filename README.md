@@ -18,7 +18,6 @@ example.com:
  ports:
   - "1089:80"
   - "2200:22"
- command: "/usr/bin/python /usr/bin/supervisord -c /etc/supervisor/supervisord.conf"
  external_links:
   - mysql_local
 ```
