@@ -7,7 +7,6 @@ apt-get install -y wget nginx supervisor libapache2-mod-rpaf sudo git mc net-too
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
-        libpng12-dev \
         libxml2 \
         libxml2-dev \
         libcurl4-openssl-dev \
@@ -17,13 +16,6 @@ apt-get install -y wget nginx supervisor libapache2-mod-rpaf sudo git mc net-too
         libxslt1-dev 
 
 WORKDIR /usr/src
-#RUN apt-get install wget -y
-RUN wget https://github.com/libgd/libgd/releases/download/gd-2.1.1/libgd-2.1.1.tar.gz
-RUN tar zxvf libgd-2.1.1.tar.gz
-WORKDIR /usr/src/libgd-2.1.1
-RUN ./configure
-RUN make
-RUN checkinstall --pkgname=libgd3
 
 
 RUN { \
@@ -39,13 +31,12 @@ ENV PHANTOMJS phantomjs-2.1.1-linux-x86_64
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         libmcrypt-dev zlib1g-dev git libgmp-dev \
-        libfreetype6-dev libjpeg62-turbo-dev libpng12-dev \
+        libfreetype6-dev libjpeg62-turbo-dev \
         build-essential chrpath libssl-dev libxft-dev \
         libfreetype6 libfontconfig1 libfontconfig1-dev \
     && ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/local/include/ \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure gmp \
-    && docker-php-ext-install iconv mcrypt mbstring pdo pdo_mysql zip gd gmp opcache \
+    && docker-php-ext-install iconv mcrypt mbstring pdo pdo_mysql zip gmp opcache \
     && curl -o ${PHANTOMJS}.tar.bz2 -SL https://bitbucket.org/ariya/phantomjs/downloads/${PHANTOMJS}.tar.bz2 \
     && tar xvjf ${PHANTOMJS}.tar.bz2 \
     && rm ${PHANTOMJS}.tar.bz2 \
@@ -58,14 +49,8 @@ ENV PHANTOMJS_BIN_PATH /usr/local/bin/phantomjs
 
 
 
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-gd=/usr/src/libgd-2.1.1/src/ \
-        && docker-php-ext-install gd \
-        &&  ln -s /usr/local/lib/libgd.so.3 /usr/lib/x86_64-linux-gnu/libgd.so.3
 
-
-RUN docker-php-ext-install iconv mcrypt \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-gd=/usr/src/libgd-2.1.1/src/ \
-    && docker-php-ext-install gd 
+RUN docker-php-ext-install iconv mcrypt  gd
 RUN docker-php-ext-install bcmath ctype curl dom gettext hash iconv json mbstring mysqli opcache posix pspell  session shmop simplexml  soap sockets tidy tokenizer wddx xsl zip pdo pdo_mysql xml  xmlrpc xmlwriter exif intl
 
 
@@ -120,7 +105,6 @@ RUN chown 33:33 /var/www/
 RUN apt-get remove -y gcc make libjpeg-dev libpng-dev libtiff-dev libvpx-dev libxpm-dev libfontconfig1-dev libxpm-dev checkinstall  libfreetype6-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
-        libpng12-dev \
         libxml2-dev \
         libcurl4-openssl-dev \
         libpspell-dev \
