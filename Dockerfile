@@ -51,13 +51,20 @@ ENV PHANTOMJS_BIN_PATH /usr/local/bin/phantomjs
 
 
 RUN docker-php-ext-install iconv mcrypt  gd
-RUN docker-php-ext-install bcmath ctype curl dom gettext hash iconv json mbstring mysqli opcache posix pspell  session shmop simplexml  soap sockets tidy tokenizer wddx xsl zip pdo pdo_mysql xml  xmlrpc xmlwriter exif intl
+RUN docker-php-ext-install bcmath ctype curl dom gettext hash iconv json mbstring mysqli opcache posix pspell  session shmop simplexml  soap sockets tidy tokenizer wddx xsl zip pdo pdo_mysql xml  xmlrpc xmlwriter exif intl 
 
 
 
 #RUN pecl install memcache && echo "extension=memcache.so" >> /usr/local/etc/php/conf.d/memcache.ini
 RUN pecl install geoip-1.1.1  && echo "extension=geoip.so" >> /usr/local/etc/php/conf.d/geoip.ini 
-
+RUN pecl install xdebug && \
+  echo "zend_extension = /usr/local/lib/php/extensions/no-debug-non-zts-20160303/xdebug.so" >> /usr/local/etc/php/conf.d/xdebug.ini_ && \
+  echo "[PHP_XDEBUG]"                                                                       >> /usr/local/etc/php/conf.d/xdebug.ini_ && \
+  echo "xdebug.profiler_output_name=\"request-%R---time-%t.cachegrind\""                    >> /usr/local/etc/php/conf.d/xdebug.ini_ && \
+  echo "xdebug.collect_params = 3"                                                          >> /usr/local/etc/php/conf.d/xdebug.ini_ && \
+  echo "xdebug.remote_log = /tmp/xdebug/xdebug.log"                                         >> /usr/local/etc/php/conf.d/xdebug.ini_ && \
+  echo "xdebug.profiler_enable = 1"                                                         >> /usr/local/etc/php/conf.d/xdebug.ini_ && \
+  echo "xdebug.profiler_output_dir=/tmp/xdebug/"                                            >> /usr/local/etc/php/conf.d/xdebug.ini_ 
 
 
 RUN a2enmod rpaf rewrite

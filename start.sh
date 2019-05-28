@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash 
 echo Prepare to start!
 echo Fixing permissions...
 chown -R 33:33 /home/sftpdev/ /var/www/html ; chmod 700 /home/sftpdev/
@@ -10,6 +10,10 @@ rm -f /run/crond.pid /run/apache2/apache2.pid
 if [ ! -z $SFTPDEV_PASSWD ]; then
 	echo Setting password sftpdev...
 	echo "sftpdev:$SFTPDEV_PASSWD" | chpasswd
+fi
+if [ "$XDEBUG_ENABLE" == "1" ]; then
+	echo Enabling xdebug extension. Search cachegrid file in catalog /tmp/xdebug
+	mv /usr/local/etc/php/conf.d/xdebug.ini_ /usr/local/etc/php/conf.d/xdebug.ini
 fi
 
 [ -z $WEB_DOCUMENTROOT ] && export WEB_DOCUMENTROOT=/var/www/html

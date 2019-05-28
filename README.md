@@ -2,7 +2,7 @@ example docker-compose.yml
 
 ```
 example.com:
- image: casp/site-php5
+ image: casp/site-php7.0
  restart: always
  container_name: example.com
  hostname: example.com
@@ -18,6 +18,11 @@ example.com:
  ports:
   - "1089:80"
   - "2200:22"
+ environment:
+  - WEB_DOCUMENTROOT=/var/www/html/deploy/current # default /var/www/html
+  - STATIC_BY_NGINX=1 #static send nginx (default 0)
+  - XDEBUG_ENABLE=1
+
  external_links:
   - mysql_local
 ```
