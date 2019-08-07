@@ -68,6 +68,9 @@ RUN pecl install xdebug && \
 
 
 RUN a2enmod rpaf rewrite
+RUN echo "RPAFenable On" > /etc/apache2/conf-enabled/remoteip.conf; \
+    echo "RPAFproxy_ips 127.0.0.1 172.17.0.1" >> /etc/apache2/conf-enabled/remoteip.conf
+
 ADD apache-security.conf /etc/apache2/conf-enabled/security.conf
 
 ADD supervisord.conf /etc/supervisor/
